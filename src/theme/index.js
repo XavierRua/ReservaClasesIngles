@@ -1,4 +1,3 @@
-
 import { Platform } from 'react-native';
  
 export const colors = {
@@ -60,4 +59,3 @@ export const coloresPorNivel = {
 };
  
 export default { colors, spacing, radius, typography, sombra, coloresPorNivel };
- 

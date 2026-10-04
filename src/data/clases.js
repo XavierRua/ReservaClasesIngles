@@ -1,7 +1,6 @@
-
 export const NIVELES = ['Todos', 'Basico', 'Intermedio', 'Avanzado', 'Conversacional'];
  
-export const CLASES = [
+export const clases = [
   {
     id: '1',
     titulo: 'Inglés desde cero',
@@ -126,4 +125,3 @@ export const CLASES = [
  
 export const formatearPrecio = (valor) =>
   '$' + valor.toLocaleString('es-CO') + ' COP';
- 
