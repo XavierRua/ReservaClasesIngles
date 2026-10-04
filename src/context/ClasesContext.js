@@ -5,25 +5,30 @@ const ClasesContext = createContext(null);
 
 export function ClasesProvider({ children }) {
   const [clases, setClases] = useState(CLASES_INICIALES);
-  const [reservadas, setReservadas] = useState(new Set());
+  // Map: id de la clase -> { dia, hora } de la reserva
+  const [reservadas, setReservadas] = useState(new Map());
 
-  function reservarClase(id) {
-    const idx = clases.findIndex((c) => c.id === id);
-    if (idx === -1) return false;
-    if (clases[idx].cupos <= 0) return false;
+  function reservarClase(id, horario) {
+    const clase = clases.find((c) => c.id === id);
+    if (!clase) return false;
+    if (clase.cupos <= 0) return false;
+    if (reservadas.has(id)) return false; // ya está reservada: no descontar otro cupo
+
     setClases((prev) =>
       prev.map((c) => (c.id === id ? { ...c, cupos: c.cupos - 1 } : c))
     );
-    setReservadas((prev) => new Set(prev).add(id));
+    setReservadas((prev) => new Map(prev).set(id, horario));
     return true;
   }
 
   function cancelarClase(id) {
-    const idx = clases.findIndex((c) => c.id === id);
-    if (idx === -1) return false;
-    setClases((prev) => prev.map((c) => (c.id === id ? { ...c, cupos: c.cupos + 1 } : c)));
+    if (!reservadas.has(id)) return false; // no hay reserva: no devolver cupo
+
+    setClases((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, cupos: c.cupos + 1 } : c))
+    );
     setReservadas((prev) => {
-      const next = new Set(prev);
+      const next = new Map(prev);
       next.delete(id);
       return next;
     });
