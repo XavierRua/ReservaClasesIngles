@@ -1,46 +1,42 @@
 import { useState, useEffect, useCallback } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getData, saveData } from '../services/asyncStorage';
 
 // Hook de persistencia de datos local (guarda en el celular)
-// Recibe una clave y un valor inicial (formato clave - valor)
+// Recibe una llave y un valor inicial (formato llave - valor)
+export default function useAlmacenamiento(key, initialValue) {
+  const [value, setValue] = useState(initialValue);
+  const [ready, setReady] = useState(false);
 
-
-export default function useAlmacenamiento(clave, valorInicial) {
-  const [valor, setValor] = useState(valorInicial);
-  const [listo, setListo] = useState(false);
-
-  // Lee la información guardada cuando el componente se monta o cambia la clave
+  // Lee la información guardada cuando el componente se monta o cambia la llave
   useEffect(() => {
-    let activo = true; // bandera: ¿el componente sigue montado?
+    let active = true; // bandera: ¿el componente sigue montado?
 
-    AsyncStorage.getItem(clave)
-      .then((guardado) => {
-        if (activo && guardado !== null) setValor(JSON.parse(guardado)); // get -> parse
+    getData(key)
+      .then((stored) => {
+        if (active && stored !== null) {
+          setValue(stored); // getData ya hace el parse
+        }
       })
-      .catch((error) => console.log('Error leyendo' + clave, error))
-      .finally(() => activo && setListo(true)); // marca que ya terminó de leer{
-
-      return () => {
-      activo = false;
-      }
-    
+      .finally(() => {
+        if (active) {
+          setReady(true);
+        }
+      });
 
     // Función de limpieza
-    
-    }, [clave]);
+    return () => {
+      active = false;
+    };
+  }, [key]);
 
-  // Actualiza el valor y lo guarda en el celular
-  const actualizar = useCallback(
-    async (nuevoValor) => {
-        setValor(nuevoValor);
-        try {
-            await AsyncStorage.setItem(clave, JSON.stringify(nuevoValor)); // set -> stringify
-        }catch (error) {
-            console.log('Error guardando' + clave, error);
-      }
+  // Actualiza la pantalla (renderiza la UI) y guarda en el celular (persistencia)
+  const update = useCallback(
+    async (newValue) => {
+      setValue(newValue); // renderiza la UI
+      await saveData(key, newValue); // persistencia de los datos
     },
-    [clave]
+    [key]
   );
 
-  return { valor, actualizar, listo };
+  return { value, update, ready };
 }

@@ -1,81 +1,76 @@
 import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// Clave de la "cajita" donde se guardan las reservas en el celular
-const CLAVE_RESERVAS = '@reservas_ingles';
+import { getData, saveData } from '../services/asyncStorage';
+import { STORAGE_KEYS } from '../constants/storageKeys';
 
 export const ReservasContext = createContext(null);
 
-export function ReservaProvider({ children }) {
-  const [reservas, setReservas] = useState([]); // se pueden reservar varias clases
-  const [cargando, setCargando] = useState(true); // bandera de carga
+export function ReservationProvider({ children }) {
+  const [reservations, setReservations] = useState([]); // se pueden reservar varias clases
+  const [loading, setLoading] = useState(true); // bandera de carga
 
-  // Cargar las reservas guardadas. Si no hay nada, queda el arreglo vacío
+  // 1. Cargar las reservas guardadas. Si no hay nada, queda el arreglo vacío
   useEffect(() => {
-    const cargar = async () => {
+    const load = async () => {
       try {
-        const guardado = await AsyncStorage.getItem(CLAVE_RESERVAS);
-        if (guardado !== null) {
-          setReservas(JSON.parse(guardado)); // get -> parse
+        const stored = await getData(STORAGE_KEYS.RESERVATIONS); // ya viene con parse
+        if (stored !== null) {
+          setReservations(stored);
         }
       } catch (error) {
         console.log('Error leyendo las reservas:', error);
       } finally {
-            setCargando(false);
+        setLoading(false);
       }
     };
 
-    cargar();
+    load();
   }, []);
 
-    // hacer el guardado de las reservas cada vez que cambian (y ya terminó de cargar)
-   useEffect(() => {
-    // Si todavía está cargando, no guarda (evita sobrescribir y que la pantalla titile)
-    if (cargando) return;
-    AsyncStorage.setItem(CLAVE_RESERVAS, JSON.stringify(reservas)) // set -> stringify
-      .catch((error) => 
-        console.log('Error al guardar reservas:', error)
-      );
-  }, [reservas, cargando]);
- 
+  // 2. Guardar las reservas cada vez que cambien
+  useEffect(() => {
+    // Si todavía está cargando, no guarda (evita sobrescribir)
+    if (loading) return;
+
+    saveData(STORAGE_KEYS.RESERVATIONS, reservations); // ya hace el stringify
+  }, [reservations, loading]);
+
   // 3. Agregar una reserva: necesita la clase y el horario
-  const agregarReserva = useCallback((clase, horario) => {
-    const nueva = {
-      id: clase.id + '-' + horario, // id único: id de la clase + horario
-      titulo: clase.titulo,
-      nivel: clase.nivel,
-      profesor: clase.profesor.nombre,
-      precio: clase.precio,
-      horario: horario,
-      creadoEn: new Date().toISOString(), // fecha en que se hizo la reserva
+  // (titulo, nivel, profesor y precio vienen así desde data/clases.js)
+  const addReservation = useCallback((classItem, schedule) => {
+    const newReservation = {
+      id: `${classItem.id}-${schedule}`, // id único: id de la clase + horario
+      title: classItem.titulo,
+      level: classItem.nivel,
+      teacher: classItem.profesor.nombre,
+      price: classItem.precio,
+      schedule: schedule,
+      createdAt: new Date().toISOString(), // fecha en que se hizo la reserva
     };
- 
-    let resultado = { ok: true };
- 
-    setReservas((previas) => {
+
+    let result = { ok: true };
+
+    setReservations((previous) => {
       // Si ya existe una reserva con ese mismo id, no la repite
-      if (previas.some((r) => r.id === nueva.id)) {
-        return previas;
+      if (previous.some((r) => r.id === newReservation.id)) {
+        result = { ok: false };
+        return previous;
       }
       // Si no existe, trae las previas y le pega la nueva (no borra nada)
-      return [nueva, ...previas];
+      return [...previous, newReservation];
     });
- 
-    return resultado;
+
+    return result;
   }, []);
- 
+
   // 4. Lo que el contexto comparte con toda la app
-  const valor = useMemo(
-    () => ({  cargando, agregarReserva,reservas }),
-    [cargando, agregarReserva,reservas]
+  const value = useMemo(
+    () => ({ reservations, loading, addReservation }),
+    [reservations, loading, addReservation]
   );
- 
+
   return (
-    <ReservasContext.Provider value={valor}>
+    <ReservasContext.Provider value={value}>
       {children}
     </ReservasContext.Provider>
   );
- // fin de ReservaProvider
-
-  
-} // esta es la llave de cierre del componente ReservaProvider
+} // fin de ReservationProvider

@@ -1,13 +1,13 @@
 import { useContext } from 'react';
 import { ReservasContext } from '../context/ReservasContext';
- 
+
 // Encapsulamiento para el acceso al contexto de reservas
 export default function useReserva() {
-  const contexto = useContext(ReservasContext);
- 
-  if (!contexto) {
-    throw new Error('useReserva debe usarse dentro de ReservaProvider');
+  const context = useContext(ReservasContext);
+
+  if (!context) {
+    throw new Error('useReserva debe usarse dentro de ReservationProvider');
   }
- 
-  return contexto;
+
+  return context;
 }

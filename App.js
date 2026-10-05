@@ -4,10 +4,10 @@ import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import ClasesStack from './src/navigation/ClasesStack';
 import { ClasesProvider } from './src/context/ClasesContext';
-import { ReservaProvider } from './src/context/ReservasContext';
+import { ReservationProvider } from './src/context/ReservasContext';
 import { colors } from './src/theme/index';
 
-const temaNavegacion = {
+const navigationTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
@@ -21,14 +21,14 @@ const temaNavegacion = {
 
 export default function App() {
   return (
-    <NavigationContainer theme={temaNavegacion}>
+    <NavigationContainer theme={navigationTheme}>
       <SafeAreaProvider>
-        <ReservaProvider>
+        <ReservationProvider>
           <ClasesProvider>
             <ClasesStack />
           </ClasesProvider>
           <StatusBar style="auto" />
-        </ReservaProvider>
+        </ReservationProvider>
       </SafeAreaProvider>
     </NavigationContainer>
   );
