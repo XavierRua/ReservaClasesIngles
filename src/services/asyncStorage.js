@@ -1,3 +1,6 @@
+/* guardar, obtener, eliminar y limpiar datos guardados en el almacenamiento local del celular. 
+Se usa para guardar las reservas que el usuario ha hecho, y poder mostrarlas en la pestaña Mis reservas */
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Guardar: set -> JSON.stringify
