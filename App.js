@@ -2,7 +2,7 @@ import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import ClasesStack from './src/navigation/ClasesStack';
+import MainTabs from './src/navigation/MainTabs';
 import { ClasesProvider } from './src/context/ClasesContext';
 import { ReservationProvider } from './src/context/ReservasContext';
 import { colors } from './src/theme/index';
@@ -25,7 +25,7 @@ export default function App() {
       <SafeAreaProvider>
         <ReservationProvider>
           <ClasesProvider>
-            <ClasesStack />
+            <MainTabs />
           </ClasesProvider>
           <StatusBar style="auto" />
         </ReservationProvider>
