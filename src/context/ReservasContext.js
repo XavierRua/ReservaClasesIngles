@@ -1,3 +1,5 @@
+// carga,guarda y comparte las reservas que el usuario ha hecho, para mostrarlas en la pestaña Mis reservas
+
 import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { getData, saveData } from '../services/asyncStorage';
 import { STORAGE_KEYS } from '../constants/storageKeys';
@@ -39,10 +41,13 @@ export function ReservationProvider({ children }) {
   const addReservation = useCallback((classItem, schedule) => {
     const newReservation = {
       id: `${classItem.id}-${schedule}`, // id único: id de la clase + horario
+      classId: classItem.id, // para saber a qué clase pertenece la reserva
       title: classItem.titulo,
       level: classItem.nivel,
       teacher: classItem.profesor.nombre,
       price: classItem.precio,
+      modality: classItem.modalidad,
+      duration: classItem.duracion,
       schedule: schedule,
       createdAt: new Date().toISOString(), // fecha en que se hizo la reserva
     };
@@ -62,10 +67,20 @@ export function ReservationProvider({ children }) {
     return result;
   }, []);
 
-  // 4. Lo que el contexto comparte con toda la app
+  // 4. Cupos disponibles = cupos de la clase - reservas guardadas de esa clase
+  // Así los cupos no se reinician al cerrar la app
+  const getAvailableSeats = useCallback(
+    (classItem) => {
+      const reserved = reservations.filter((r) => r.classId === classItem.id).length;
+      return Math.max(classItem.cupos - reserved, 0);
+    },
+    [reservations]
+  );
+
+  // 5. Lo que el contexto comparte con toda la app
   const value = useMemo(
-    () => ({ reservations, loading, addReservation }),
-    [reservations, loading, addReservation]
+    () => ({ reservations, loading, addReservation, getAvailableSeats }),
+    [reservations, loading, addReservation, getAvailableSeats]
   );
 
   return (
