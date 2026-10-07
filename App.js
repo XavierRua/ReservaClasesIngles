@@ -1,3 +1,4 @@
+// aca se define lo que se va a mostrar en la app, y se define el tema de colores de la app.
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
