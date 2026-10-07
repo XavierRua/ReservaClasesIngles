@@ -1,5 +1,3 @@
-// pantalla de inicio, donde se muestran todas las clases disponibles y se puede filtrar por nivel y buscar por texto
-
 import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, TextInput, ScrollView, FlatList } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -41,7 +39,7 @@ export default function InicioScreen({ navigation }) {
       <View style={styles.header}>
         <Text style={typography.titulo}>Clases de inglés</Text>
 
-        //Buscador 
+        {/* Buscador */}
         <View style={styles.searchBox}>
           <Ionicons name="search" size={18} color={colors.textoSuave} />
           <TextInput
@@ -127,7 +125,7 @@ const styles = StyleSheet.create({
     borderColor: colors.borde,
   },
   input: { flex: 1, fontSize: 14, color: colors.texto, paddingVertical: 0 },
-  chipsScroll: { flexGrow: 0, marginVertical: spacing.md },
-  chips: { paddingHorizontal: spacing.lg, gap: spacing.sm },
+  chipsScroll: { flexGrow: 0, flexShrink: 0, marginVertical: spacing.md }, // no se encoge
+  chips: { paddingHorizontal: spacing.lg, alignItems: 'center' },
   list: { paddingHorizontal: spacing.md, paddingBottom: spacing.lg, flexGrow: 1 },
 });

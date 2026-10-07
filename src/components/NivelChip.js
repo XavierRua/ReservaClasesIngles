@@ -1,22 +1,29 @@
-import { Pressable, StyleSheet, Text } from "react-native";
-import { colors, radius, spacing } from "../theme/index";
+// botones de basico, intermedio y avanzado que se usan en la pantalla de clases
 
+import React from 'react';
+import { Pressable, StyleSheet, Text } from 'react-native';
+import { colors, radius, spacing } from '../theme/index';
+
+// Botón de nivel (Todos, Basico, Intermedio...)
+// Se usa en InicioScreen (filtro) y en PerfilScreen (elegir nivel)
 export default function NivelChip({ etiqueta, activo, onPress }) {
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [
-        style.chip,
-        activo && style.chipActivo,
-        pressed && { opacity: 0.7 },
+        styles.chip,
+        activo && styles.chipActive,
+        pressed && styles.chipPressed,
       ]}
     >
-      <Text style={[style.texto, activo && style.textoActivo]}>{etiqueta}</Text>
+      <Text style={[styles.text, activo && styles.textActive]}>{etiqueta}</Text>
     </Pressable>
   );
 }
-const style = StyleSheet.create({
+
+const styles = StyleSheet.create({
   chip: {
+    alignSelf: 'flex-start', // el chip mide solo lo que necesita su texto
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.lg,
     borderRadius: radius.full,
@@ -25,10 +32,11 @@ const style = StyleSheet.create({
     borderColor: colors.borde,
     marginRight: spacing.sm,
   },
-  chipActivo: {
+  chipActive: {
     backgroundColor: colors.primario,
     borderColor: colors.primario,
   },
-  texto: { fontSize: 13, fontWeight: "600", color: colors.textoSuave },
-  textoActivo: { color: "#FFFFFF" },
+  chipPressed: { opacity: 0.7 },
+  text: { fontSize: 13, fontWeight: '600', color: colors.textoSuave },
+  textActive: { color: '#FFFFFF' },
 });
